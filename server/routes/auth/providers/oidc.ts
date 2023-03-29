@@ -41,6 +41,19 @@ Strategy.prototype.userProfile = async function (accessToken, done) {
   }
 };
 
+Strategy.prototype.authorizationParams = function (options: any) {
+  return options.originalQuery || {};
+};
+
+const oauthAuthenticate = Strategy.prototype.authenticate;
+
+Strategy.prototype.authenticate = function (req, options) {
+  options.originalQuery = req.query;
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const self = this;
+  oauthAuthenticate.bind(self)(req, options);
+};
+
 if (env.OIDC_CLIENT_ID && env.OIDC_CLIENT_SECRET) {
   passport.use(
     providerName,
